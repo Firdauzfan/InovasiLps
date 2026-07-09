@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Health — Pemantauan Kesehatan Pegawai</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg: #F6F8FA;
+  --surface: #FFFFFF;
+  --surface-2: #F1F5F8;
+  --surface-3: #E8EEF2;
+  --border: #E3E9EE;
+  --border-soft: #EDF1F4;
+
+  --text: #17222B;
+  --text-muted: #64748B;
+  --text-faint: #9AA7B4;
+
+  --blue: #F2823D;
+  --blue-soft: #FFF0E2;
+  --blue-dim: #FAD4B0;
+
+  --orange: #2F6FED;
+  --orange-soft: #EAF2FF;
+  --orange-dim: #C7DBFB;
+
+  --green: #22B573;
+  --green-soft: #E6F8EF;
+  --green-dim: #B9EBD2;
+
+  --red: #E8495F;
+  --red-soft: #FDECEF;
+  --red-dim: #F6C4CD;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --shadow-card: 0 1px 2px rgba(23,34,43,0.04), 0 1px 12px rgba(23,34,43,0.03);
+  --shadow-pop: 0 8px 28px rgba(23,34,43,0.10);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(600px circle at 92% -6%, rgba(242,130,61,0.08), transparent 55%),
+    radial-gradient(520px circle at -4% 18%, rgba(47,111,237,0.05), transparent 55%);
+  background-attachment: fixed;
+}
+
+/* ===== Layout ===== */
+.app{ display:flex; min-height:100vh; }
+
+/* ===== Sidebar ===== */
+.sidebar{
+  width: 240px;
+  flex-shrink:0;
+  background: var(--surface);
+  border-right: 1px solid var(--border-soft);
+  display:flex;
+  flex-direction:column;
+  padding: 22px 14px;
+  position: sticky;
+  top:0;
+  height:100vh;
+  z-index: 40;
+}
+.brand{
+  display:flex; align-items:center; gap:10px;
+  padding: 4px 10px 26px 10px;
+}
+.brand-mark{
+  width:32px; height:32px; border-radius:9px;
+  background: linear-gradient(135deg, var(--blue), var(--orange));
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-display); font-weight:700; font-size:15px; color:#fff;
+}
+.brand-name{ font-family: var(--font-display); font-weight:600; font-size:16.5px; letter-spacing:0.1px;}
+.brand-sub{ font-size:10px; color:var(--text-faint); font-family:var(--font-mono); letter-spacing:1px; text-transform:uppercase; margin-top:1px;}
+
+.sidebar-close{
+  display:none; margin-left:auto; width:30px; height:30px; border-radius:8px;
+  align-items:center; justify-content:center; color:var(--text-muted); cursor:pointer;
+  border:1px solid var(--border);
+}
+
+.nav-group-label{
+  font-family: var(--font-mono);
+  font-size:10px; letter-spacing:1.4px; text-transform:uppercase;
+  color: var(--text-faint); padding: 15px 10px 7px;
+}
+.nav-item{
+  display:flex; align-items:center; gap:11px;
+  padding:10px 12px; border-radius:9px;
+  color: var(--text-muted); font-size:13.5px; font-weight:500;
+  cursor:pointer; transition: all .15s ease; margin-bottom:2px;
+}
+.nav-item:hover{ background: var(--surface-2); color: var(--text); }
+.nav-item.active{
+  background: var(--blue-soft);
+  color: var(--blue);
+  box-shadow: inset 3px 0 0 var(--blue);
+}
+.nav-icon{ width:16px; height:16px; flex-shrink:0; }
+.nav-badge{
+  margin-left:auto; font-family:var(--font-mono); font-size:10px;
+  background: var(--orange-soft); color: var(--orange); padding:1px 7px; border-radius:20px; font-weight:600;
+}
+
+.sidebar-footer{
+  margin-top:auto; padding-top:16px; border-top:1px solid var(--border-soft);
+  display:flex; align-items:center; gap:10px; padding-left:8px;
+}
+.avatar-sm{
+  width:32px;height:32px;border-radius:50%;
+  background: var(--blue-soft);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono); font-size:11px; color:var(--blue); font-weight:600;
+}
+.sidebar-footer .name{ font-size:12.5px; font-weight:600; }
+.sidebar-footer .role{ font-size:10.5px; color:var(--text-faint); }
+
+.sidebar-overlay{
+  display:none; position:fixed; inset:0; background: rgba(15,23,32,0.35);
+  z-index:35;
+}
+
+/* ===== Main ===== */
+.main{ flex:1; min-width:0; display:flex; flex-direction:column; }
+
+.mobile-topbar{ display:none; }
+
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 20px 30px; border-bottom:1px solid var(--border-soft);
+  flex-wrap: wrap; gap:14px;
+  background: var(--surface);
+  position: relative;
+}
+.topbar::after{
+  content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+  background: linear-gradient(90deg, var(--blue) 0%, var(--blue) 40%, var(--orange) 100%);
+  opacity:0.55;
+}
+.page-title{ font-family:var(--font-display); font-size:21px; font-weight:600; }
+.page-sub{ font-size:12.5px; color:var(--text-muted); margin-top:3px; }
+.topbar-right{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.pill{
+  font-family:var(--font-mono); font-size:11px; padding:6px 12px; border-radius:20px;
+  border:1px solid var(--border); color:var(--text-muted); display:flex; align-items:center; gap:6px;
+  background: var(--surface-2);
+}
+.dot{ width:6px;height:6px;border-radius:50%; background:var(--green); }
+.btn{
+  font-family: var(--font-body); font-weight:600; font-size:13px;
+  padding:9px 16px; border-radius:9px; cursor:pointer; border:1px solid transparent;
+  transition: all .15s ease; white-space:nowrap;
+}
+.btn-primary{ background: var(--blue); color:#fff; }
+.btn-primary:hover{ background:#DD6B22; }
+.btn-ghost{ background: var(--surface); border-color:var(--border); color:var(--text); }
+.btn-ghost:hover{ border-color: var(--blue); color: var(--blue); }
+
+.content{ padding: 26px 30px 60px; flex:1; }
+.view{ display:none; }
+.view.active{ display:block; animation: fadeIn .25s ease; }
+@keyframes fadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+/* ===== Signature divider (pulse line) ===== */
+.pulse-divider{ width:100%; height:20px; margin: 24px 0; }
+.pulse-divider path{ stroke: var(--blue-dim); stroke-width:1.6; fill:none; }
+
+/* ===== Grid & Cards ===== */
+.grid{ display:grid; gap:16px; }
+.grid-3{ grid-template-columns: repeat(3, 1fr); }
+.grid-4{ grid-template-columns: repeat(4, 1fr); }
+.grid-2{ grid-template-columns: 1.3fr 1fr; }
+
+.card{
+  background: var(--surface); border:1px solid var(--border-soft);
+  border-radius: 14px; padding:20px; box-shadow: var(--shadow-card);
+  position: relative; overflow:hidden;
+}
+.card.accent-card::before{
+  content:''; position:absolute; top:-40px; right:-40px; width:140px; height:140px; border-radius:50%;
+  background: radial-gradient(circle, rgba(242,130,61,0.12), rgba(47,111,237,0.07) 70%, transparent 75%);
+  pointer-events:none;
+}
+.card-title{
+  font-family: var(--font-display); font-size:14.5px; font-weight:600;
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;
+}
+.card-title .sub-action{ font-size:11.5px; color:var(--blue); font-weight:600; cursor:pointer; font-family:var(--font-body);}
+.card-title .sub-action:hover{ text-decoration:underline; }
+
+/* KPI mini cards */
+.kpi{
+  background: var(--surface); border:1px solid var(--border-soft); border-radius:14px;
+  padding:16px 18px; box-shadow: var(--shadow-card);
+  position: relative; overflow:hidden;
+}
+.kpi::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background: var(--blue);
+}
+.kpi:nth-child(2n)::before{ background: var(--orange); }
+.kpi-label{ font-size:11.5px; color:var(--text-muted); font-weight:500; }
+.kpi-value{ font-family:var(--font-mono); font-size:25px; font-weight:600; margin-top:8px; }
+.kpi-trend{ font-size:11px; margin-top:6px; font-weight:600; }
+.trend-up{ color:var(--green); }
+.trend-down{ color:var(--red); }
+.trend-flat{ color:var(--text-faint); }
+
+/* ===== Health Index Gauge ===== */
+.gauge-wrap{ display:flex; align-items:center; gap:26px; flex-wrap:wrap; }
+.gauge-num{ font-family:var(--font-mono); font-size:42px; font-weight:600; fill:var(--text); }
+.gauge-label{ font-family:var(--font-mono); font-size:10.5px; fill:var(--text-faint); }
+.gauge-info{ flex:1; min-width:220px; }
+.status-chip{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--font-mono); font-size:11.5px; font-weight:600;
+  padding:5px 12px; border-radius:20px; margin-bottom:10px;
+}
+.status-good{ background: var(--green-soft); color: #1A9760; }
+.status-warn{ background: var(--orange-soft); color: var(--orange); }
+.status-risk{ background: var(--red-soft); color: var(--red); }
+.gauge-desc{ font-size:13px; color:var(--text-muted); line-height:1.65; max-width:360px; }
+.factor-row{ display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+.factor-tag{
+  font-family:var(--font-mono); font-size:10.5px; padding:5px 10px; border-radius:6px;
+  background: var(--surface-2); border:1px solid var(--border); color:var(--text-muted);
+}
+
+/* ===== Vital list ===== */
+.vital-item{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 12px 0; border-bottom:1px solid var(--border-soft);
+}
+.vital-item:last-child{ border-bottom:none; padding-bottom:0; }
+.vital-name{ display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500;}
+.vital-icon{ width:30px;height:30px;border-radius:9px; background:var(--blue-soft); display:flex;align-items:center;justify-content:center; font-size:14px; }
+.vital-item:nth-child(even) .vital-icon{ background: var(--orange-soft); }
+.vital-value{ font-family:var(--font-mono); font-size:14px; font-weight:600; text-align:right; }
+.vital-range{ font-size:10.5px; color:var(--text-faint); text-align:right; margin-top:2px;}
+
+/* ===== Timeline (riwayat penyakit) ===== */
+.timeline{ position:relative; padding-left:26px; }
+.timeline::before{
+  content:''; position:absolute; left:6px; top:6px; bottom:6px; width:1.5px;
+  background: var(--border);
+}
+.tl-item{ position:relative; padding-bottom:24px; }
+.tl-item:last-child{ padding-bottom:0; }
+.tl-dot{
+  position:absolute; left:-26px; top:2px; width:13px;height:13px;border-radius:50%;
+  background: var(--surface); border:2px solid var(--blue);
+}
+.tl-dot.risk{ border-color: var(--red); }
+.tl-dot.warn{ border-color: var(--orange); }
+.tl-date{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); }
+.tl-title{ font-size:13.5px; font-weight:600; margin:4px 0 4px; }
+.tl-desc{ font-size:12.5px; color:var(--text-muted); line-height:1.6; }
+.tl-tags{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.tl-tag{ font-size:10px; font-family:var(--font-mono); padding:3px 8px; border-radius:5px; background:var(--surface-2); border:1px solid var(--border); color:var(--text-muted); }
+
+/* ===== Recommendation cards ===== */
+.rec-card{
+  background: var(--surface); border:1px solid var(--border-soft); border-radius:14px;
+  padding:18px; display:flex; flex-direction:column; gap:10px;
+  border-left: 3px solid var(--blue); box-shadow: var(--shadow-card);
+}
+.rec-card.amber{ border-left-color: var(--orange); }
+.rec-card.red{ border-left-color: var(--red); }
+.rec-tag{ font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-faint); }
+.rec-title{ font-family:var(--font-display); font-size:14.5px; font-weight:600; }
+.rec-desc{ font-size:12.5px; color:var(--text-muted); line-height:1.6; }
+.rec-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:6px; flex-wrap:wrap; gap:8px; }
+.rec-priority{ font-size:10.5px; font-family:var(--font-mono); color:var(--text-faint); }
+.rec-foot .sub-action{ font-size:11.5px; color:var(--blue); font-weight:600; cursor:pointer; }
+
+/* ===== Bar chart (dept risk) ===== */
+.bar-row{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.bar-label{ width:120px; font-size:12px; color:var(--text-muted); flex-shrink:0; }
+.bar-track{ flex:1; height:9px; background:var(--surface-2); border-radius:6px; overflow:hidden; }
+.bar-fill{ height:100%; border-radius:6px; background: var(--blue); }
+.bar-fill.amber{ background: var(--orange); }
+.bar-fill.red{ background: var(--red); }
+.bar-fill.green{ background: var(--green); }
+.bar-val{ width:36px; text-align:right; font-family:var(--font-mono); font-size:11.5px; color:var(--text-muted); flex-shrink:0; }
+
+/* Table */
+.table-wrap{ overflow-x:auto; }
+.table{ width:100%; border-collapse:collapse; min-width:520px; }
+.table th{
+  text-align:left; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase;
+  letter-spacing:0.8px; color:var(--text-faint); padding:0 10px 12px; font-weight:500;
+}
+.table td{ padding:12px 10px; font-size:12.5px; border-top:1px solid var(--border-soft); }
+.table tr:hover td{ background: var(--surface-2); }
+.risk-badge{
+  font-family:var(--font-mono); font-size:10.5px; padding:3px 10px; border-radius:20px; display:inline-block; font-weight:600;
+}
+.risk-low{ background:var(--green-soft); color:#1A9760; }
+.risk-mid{ background:var(--orange-soft); color:var(--orange); }
+.risk-high{ background:var(--red-soft); color:var(--red); }
+
+/* Schedule list */
+.sched-item{ display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid var(--border-soft); }
+.sched-item:last-child{ border:none; }
+.sched-date{
+  width:50px; text-align:center; background:var(--blue-soft); border-radius:9px; padding:8px 0;
+  font-family:var(--font-mono); flex-shrink:0;
+}
+.sched-date .d{ font-size:16px; font-weight:600; line-height:1; color:var(--blue); }
+.sched-date .m{ font-size:9px; color:var(--blue); opacity:0.75; text-transform:uppercase; margin-top:2px;}
+.sched-info .t{ font-size:13px; font-weight:600; }
+.sched-info .s{ font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+
+.section-title{ font-family:var(--font-display); font-size:16.5px; font-weight:600; margin: 30px 0 15px; display:flex; align-items:center; gap:9px; }
+.section-title:first-child{ margin-top:0; }
+.section-title::before{ content:''; width:4px; height:16px; border-radius:3px; background: var(--blue); display:inline-block; }
+.section-title.orange::before{ background: var(--orange); }
+.section-title .st-action{
+  margin-left:auto; font-family:var(--font-body); font-size:12px; font-weight:600;
+  color: var(--blue); cursor:pointer; white-space:nowrap;
+}
+.section-title .st-action:hover{ text-decoration:underline; }
+ 
+
+.muted{ color:var(--text-muted); }
+
+/* ===================== RESPONSIVE ===================== */
+
+/* Tablet */
+@media (max-width: 1080px){
+  .grid-4{ grid-template-columns: repeat(2, 1fr); }
+  .grid-3{ grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 900px){
+  .grid-2{ grid-template-columns: 1fr; }
+}
+
+/* Mobile + small tablet: off-canvas sidebar */
+@media (max-width: 768px){
+  .sidebar{
+    position: fixed; left:0; top:0; height:100vh;
+    transform: translateX(-100%);
+    transition: transform .22s ease;
+    box-shadow: var(--shadow-pop);
+    width: 260px;
+  }
+  .sidebar.open{ transform: translateX(0); }
+  .sidebar-close{ display:flex; }
+  .sidebar-overlay.open{ display:block; }
+
+  .mobile-topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 14px 16px; background: var(--surface); border-bottom:1px solid var(--border-soft);
+    position: sticky; top:0; z-index:20;
+  }
+  .mobile-topbar .brand{ padding:0; }
+  .hamburger{
+    width:38px; height:38px; border-radius:9px; border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text);
+    background: var(--surface);
+  }
+
+  .topbar{ padding: 18px 18px; }
+  .content{ padding: 20px 18px 50px; }
+  .page-title{ font-size:18.5px; }
+
+  .grid-4, .grid-3{ grid-template-columns: 1fr; }
+  .gauge-wrap{ gap:18px; }
+  .bar-label{ width:96px; font-size:11px; }
+}
+
+@media (max-width: 480px){
+  .topbar-right{ width:100%; }
+  .topbar-right .btn{ flex:1; text-align:center; }
+  .kpi-value{ font-size:22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="sidebar-overlay" id="overlay"></div>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">O</div>
+      <div>
+        <div class="brand-name">One Health</div>
+        <div class="brand-sub">Employee Health Monitoring</div>
+      </div>
+      <div class="sidebar-close" id="sidebarClose">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-group-label">Pegawai</div>
+    <div class="nav-item active" data-view="dashboard">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+      Dashboard Kesehatan
+    </div>
+    <div class="nav-item" data-view="riwayat">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l3 3M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg>
+      Riwayat Kesehatan
+    </div>
+    <div class="nav-item" data-view="rekomendasi">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+      Rekomendasi
+      <span class="nav-badge">6</span>
+    </div>
+    <div class="nav-item" data-view="jadwal">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+      Jadwal Check-up
+    </div>
+
+    <div class="nav-group-label">Organisasi</div>
+    <div class="nav-item" data-view="admin">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18M7 15l4-6 4 4 5-8"/></svg>
+      Analitik Admin/HR
+    </div>
+    <div class="nav-item" data-view="pegawai">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c.7-3.6 3.4-5.5 6.5-5.5s5.8 1.9 6.5 5.5M17 8.5a3 3 0 1 1 0-6M21.5 20a6 6 0 0 0-4.5-5.7"/></svg>
+      Data Pegawai
+    </div>
+    <div class="nav-item" data-view="wellness">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+      Program Kesehatan
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="avatar-sm">YA</div>
+      <div>
+        <div class="name">Yusron A.</div>
+        <div class="role">Group Pengelolaan Data Asuransi</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+
+    <div class="mobile-topbar">
+      <div class="brand">
+        <div class="brand-mark">V</div>
+        <div>
+          <div class="brand-name">One Health</div>
+        </div>
+      </div>
+      <div class="hamburger" id="hamburger">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </div>
+    </div>
+
+    <!-- ============ VIEW: DASHBOARD PEGAWAI ============ -->
+    <section class="view active" id="view-dashboard">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Dashboard Kesehatan</div>
+          <div class="page-sub">Ringkasan kondisi kesehatan Anda per 08 Juli 2026</div>
+        </div>
+        <div class="topbar-right">
+          <!-- <div class="pill"><span class="dot"></span> Data tersinkron</div> -->
+          <button class="btn btn-ghost">Input Self-Assessment</button>
+          <button class="btn btn-primary">Unduh Laporan</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="grid grid-2">
+          <div class="card accent-card">
+            <div class="card-title">Skor Indeks Kesehatan (SIK) <span class="sub-action">Metodologi →</span></div>
+            <div class="gauge-wrap">
+              <svg width="140" height="140" viewBox="0 0 150 150">
+                <circle cx="75" cy="75" r="62" fill="none" stroke="var(--surface-2)" stroke-width="12"/>
+                <circle cx="75" cy="75" r="62" fill="none" stroke="url(#gaugeGrad)" stroke-width="12"
+                  stroke-linecap="round" stroke-dasharray="389.5" stroke-dashoffset="82.8"
+                  transform="rotate(-90 75 75)"/>
+                <defs>
+                  <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#F2823D"/>
+                    <stop offset="100%" stop-color="#22B573"/>
+                  </linearGradient>
+                </defs>
+                <text x="75" y="85" text-anchor="middle" class="gauge-num">78.7</text>
+                <text x="75" y="108" text-anchor="middle" class="gauge-label">DARI 100</text>
+              </svg>
+              <div class="gauge-info">
+                <div class="status-chip status-good">● BAIK — Tingkat Kesehatan II</div>
+                <div class="gauge-desc">Skor Anda naik 4.2 poin sejak evaluasi bulan lalu. Dipengaruhi utamanya oleh perbaikan profil kolesterol dan aktivitas fisik rutin.</div>
+                <div class="factor-row">
+                  <span class="factor-tag">BMI: 22.4</span>
+                  <span class="factor-tag">Tek. Darah: 118/76</span>
+                  <span class="factor-tag">Gula Darah: 92 mg/dL</span>
+                  <span class="factor-tag">Kolesterol Total: 178</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Self Assessment Terbaru <span class="sub-action">Riwayat →</span></div>
+            <div class="vital-item">
+              <div class="vital-name"><div class="vital-icon">❤️</div>Tekanan Darah</div>
+              <div><div class="vital-value">118/76</div><div class="vital-range">Normal · mmHg</div></div>
+            </div>
+            <div class="vital-item">
+              <div class="vital-name"><div class="vital-icon">🩸</div>Gula Darah Puasa</div>
+              <div><div class="vital-value">92</div><div class="vital-range">Normal · mg/dL</div></div>
+            </div>
+            <div class="vital-item">
+              <div class="vital-name"><div class="vital-icon">⚖️</div>Indeks Massa Tubuh</div>
+              <div><div class="vital-value">22.4</div><div class="vital-range">Ideal · kg/m²</div></div>
+            </div>
+            <div class="vital-item">
+              <div class="vital-name"><div class="vital-icon">🫁</div>Saturasi Oksigen</div>
+              <div><div class="vital-value">98%</div><div class="vital-range">Normal</div></div>
+            </div>
+          </div>
+        </div>
+
+        <svg class="pulse-divider" viewBox="0 0 1000 20" preserveAspectRatio="none">
+          <path d="M0,10 L380,10 L400,2 L420,18 L440,10 L460,10 L480,4 L495,16 L510,10 L1000,10"/>
+        </svg>
+
+        <div class="grid grid-4">
+          <div class="kpi">
+            <div class="kpi-label">Kehadiran Medical Check-up</div>
+            <div class="kpi-value">Sudah</div>
+            <div class="kpi-trend trend-flat">untuk tahun ini</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Hari Sejak Check-up Terakhir</div>
+            <div class="kpi-value">42</div>
+            <div class="kpi-trend trend-up">Jadwal berikutnya 12 Sep</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Skor Aktivitas Fisik</div>
+            <div class="kpi-value">7.2<span style="font-size:14px;color:var(--text-faint)">/10</span></div>
+            <div class="kpi-trend trend-up">↑ 0.8 dari bulan lalu</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Faktor Risiko Aktif</div>
+            <div class="kpi-value">1</div>
+            <div class="kpi-trend trend-down">Kolesterol perlu dipantau</div>
+          </div>
+        </div>
+
+        <div class="section-title">Rekomendasi Prioritas<span class="st-action">Lihat Detail →</span></div>
+        <div class="grid grid-3">
+          <div class="rec-card">
+            <div class="rec-tag">Nutrisi</div>
+            <div class="rec-title">Pertahankan asupan serat harian</div>
+            <div class="rec-desc">Konsumsi serat Anda konsisten di atas target. Lanjutkan pola makan whole-food untuk menjaga profil kolesterol.</div>
+            <div class="rec-foot"><span class="rec-priority">PRIORITAS: RENDAH</span><span class="sub-action">Detail →</span></div>
+          </div>
+          <div class="rec-card amber">
+            <div class="rec-tag">Kardiovaskular</div>
+            <div class="rec-title">Tingkatkan latihan kardio 2x/minggu</div>
+            <div class="rec-desc">Kolesterol LDL sedikit di atas ambang optimal. Latihan kardio 30 menit terbukti efektif menurunkan dalam 8 minggu.</div>
+            <div class="rec-foot"><span class="rec-priority">PRIORITAS: SEDANG</span><span class="sub-action">Detail →</span></div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-tag">Preventif</div>
+            <div class="rec-title">Jadwalkan pemeriksaan mata tahunan</div>
+            <div class="rec-desc">Terakhir dilakukan 14 bulan lalu. Direkomendasikan untuk pegawai dengan screen-time tinggi.</div>
+            <div class="rec-foot"><span class="rec-priority">PRIORITAS: RENDAH</span><span class="sub-action">Jadwalkan →</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW: RIWAYAT KESEHATAN ============ -->
+    <section class="view" id="view-riwayat">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Riwayat Kesehatan</div>
+          <div class="page-sub">Riwayat penyakit, diagnosis, dan hasil pemeriksaan</div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-ghost">Filter Tahun</button>
+          <button class="btn btn-primary">+ Tambah Catatan</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-title">Timeline Riwayat Penyakit</div>
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-date">02 JUL 2026</div>
+                <div class="tl-title">Medical Check-up Rutin — Hasil Normal</div>
+                <div class="tl-desc">Seluruh parameter dalam rentang normal. Kolesterol LDL turun ke 118 mg/dL dari 134 mg/dL.</div>
+                <div class="tl-tags"><span class="tl-tag">Check-up Tahunan</span><span class="tl-tag">RS Mitra Sehat</span></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot warn"></div>
+                <div class="tl-date">15 MAR 2026</div>
+                <div class="tl-title">Kenaikan Kolesterol Terdeteksi</div>
+                <div class="tl-desc">LDL 134 mg/dL (di atas ambang 130). Dokter merekomendasikan perubahan pola makan dan olahraga tanpa obat.</div>
+                <div class="tl-tags"><span class="tl-tag">Pemeriksaan Lab</span><span class="tl-tag">Kolesterol</span></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-date">20 NOV 2025</div>
+                <div class="tl-title">Vaksinasi Influenza Tahunan</div>
+                <div class="tl-desc">Vaksinasi dilakukan tanpa reaksi alergi. Direkomendasikan ulang November 2026.</div>
+                <div class="tl-tags"><span class="tl-tag">Imunisasi</span></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot risk"></div>
+                <div class="tl-date">08 AUG 2024</div>
+                <div class="tl-title">Tifus — Rawat Jalan</div>
+                <div class="tl-desc">Diagnosis demam tifoid, penanganan antibiotik selama 10 hari. Pemulihan penuh, tidak ada komplikasi lanjutan.</div>
+                <div class="tl-tags"><span class="tl-tag">Penyakit Infeksi</span><span class="tl-tag">Selesai</span></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-date">03 JAN 2023</div>
+                <div class="tl-title">Riwayat Alergi — Udang & Kacang</div>
+                <div class="tl-desc">Tercatat sejak pemeriksaan awal bergabung. Reaksi ringan berupa urtikaria, tidak anafilaksis.</div>
+                <div class="tl-tags"><span class="tl-tag">Alergi</span><span class="tl-tag">Kronis</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-title">Kondisi Kronis Tercatat</div>
+              <div class="table-wrap">
+              <table class="table">
+                <tr><th>Kondisi</th><th>Sejak</th><th>Status</th></tr>
+                <tr><td>Alergi makanan laut</td><td>2023</td><td><span class="risk-badge risk-low">Terkontrol</span></td></tr>
+                <tr><td>Kolesterol</td><td>2026</td><td><span class="risk-badge risk-mid">Dipantau</span></td></tr>
+              </table>
+              </div>
+            </div>
+            <!-- <div class="card">
+              <div class="card-title">Riwayat Keluarga</div>
+              <div class="table-wrap">
+              <table class="table">
+                <tr><th>Kondisi</th><th>Hubungan</th></tr>
+                <tr><td>Diabetes Tipe 2</td><td>Ayah</td></tr>
+                <tr><td>Hipertensi</td><td>Ibu</td></tr>
+              </table>
+              </div>
+              <div class="rec-desc" style="margin-top:10px;">Digunakan sistem untuk kalkulasi skor risiko prediktif jangka panjang.</div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW: REKOMENDASI ============ -->
+    <section class="view" id="view-rekomendasi">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Rekomendasi Kesehatan</div>
+          <div class="page-sub">Dihasilkan otomatis berdasarkan data vital, riwayat, dan faktor risiko Anda</div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-ghost">Tandai Selesai Semua</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid grid-3">
+          <div class="rec-card amber">
+            <div class="rec-tag">Kardiovaskular · Sedang</div>
+            <div class="rec-title">Tingkatkan latihan kardio 2x/minggu</div>
+            <div class="rec-desc">30 menit jalan cepat, bersepeda, atau berenang terbukti menurunkan LDL 5–10% dalam 8 minggu.</div>
+            <div class="rec-foot"><span class="rec-priority">Target: 30 Sep 2026</span><span class="sub-action">Tandai selesai</span></div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-tag">Nutrisi · Rendah</div>
+            <div class="rec-title">Pertahankan asupan serat & protein whole-food</div>
+            <div class="rec-desc">Pola makan boiling/steaming/grilling Anda sudah optimal — lanjutkan dan kurangi frekuensi gorengan saat makan di luar.</div>
+            <div class="rec-foot"><span class="rec-priority">Berkelanjutan</span><span class="sub-action">Tandai selesai</span></div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-tag">Preventif · Rendah</div>
+            <div class="rec-title">Pemeriksaan mata tahunan</div>
+            <div class="rec-desc">14 bulan sejak pemeriksaan terakhir. Direkomendasikan bagi pegawai dengan screen-time tinggi (>8 jam/hari).</div>
+            <div class="rec-foot"><span class="rec-priority">Target: 31 Agu 2026</span><span class="sub-action">Jadwalkan</span></div>
+          </div>
+          <div class="rec-card red">
+            <div class="rec-tag">Genetik · Perlu Perhatian</div>
+            <div class="rec-title">Skrining diabetes dini (riwayat keluarga)</div>
+            <div class="rec-desc">Riwayat diabetes Tipe 2 pada ayah meningkatkan risiko prediktif Anda 1.6x. Disarankan tes HbA1c setiap 6 bulan.</div>
+            <div class="rec-foot"><span class="rec-priority">Target: 20 Jul 2026</span><span class="sub-action">Jadwalkan</span></div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-tag">Ergonomi · Rendah</div>
+            <div class="rec-title">Regangan postur setiap 90 menit kerja</div>
+            <div class="rec-desc">Data aktivitas menunjukkan rata-rata 6.5 jam duduk tanpa jeda. Atur pengingat berkala.</div>
+            <div class="rec-foot"><span class="rec-priority">Berkelanjutan</span><span class="sub-action">Tandai selesai</span></div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-tag">Mental · Rendah</div>
+            <div class="rec-title">Ikuti sesi konseling bulanan</div>
+            <div class="rec-desc">Program mindfulness 20 menit tersedia setiap Jumat minggu pertama pukul 15.00 melalui menu sesi konseling.</div>
+            <div class="rec-foot"><span class="rec-priority">Opsional</span><span class="sub-action">Daftar →</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW: JADWAL ============ -->
+    <section class="view" id="view-jadwal">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Jadwal Medical Check-up</div>
+          <div class="page-sub">Agenda pemeriksaan kesehatan Anda</div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary">+ Ajukan Jadwal Baru</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-title">Jadwal Mendatang</div>
+            <div class="sched-item">
+              <div class="sched-date"><div class="d">12</div><div class="m">Jul</div></div>
+              <div class="sched-info">
+                <div class="t">Medical Check-up Tahunan</div>
+                <div class="s">RS Mitra Sehat · 08:00 WIB · Puasa 10 jam</div>
+              </div>
+            </div>
+            <div class="sched-item">
+              <div class="sched-date"><div class="d">20</div><div class="m">Agu</div></div>
+              <div class="sched-info">
+                <div class="t">Vaksininasi Hepatitis C</div>
+                <div class="s">RS Pondok Indah · 09:30 WIB</div>
+              </div>
+            </div>
+            <div class="sched-item">
+              <div class="sched-date"><div class="d">31</div><div class="m">Sep</div></div>
+              <div class="sched-info">
+                <div class="t">Pemeriksaan Mata</div>
+                <div class="s">Optik Medika Partner · 13:00 WIB</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Riwayat Kehadiran Check-up</div>
+            <div class="table-wrap">
+            <table class="table">
+              <tr><th>Periode</th><th>Jenis</th><th>Status</th></tr>
+              <tr><td>Q2 2026</td><td>Check-up Rutin</td><td><span class="risk-badge risk-low">Hadir</span></td></tr>
+              <tr><td>Q1 2026</td><td>Skrining Kolesterol</td><td><span class="risk-badge risk-low">Hadir</span></td></tr>
+              <tr><td>Q4 2025</td><td>Vaksinasi Influenza</td><td><span class="risk-badge risk-low">Hadir</span></td></tr>
+              <tr><td>Q3 2025</td><td>Check-up Rutin</td><td><span class="risk-badge risk-low">Hadir</span></td></tr>
+            </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW: ADMIN ANALYTICS ============ -->
+    <section class="view" id="view-admin">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Analitik Kesehatan Organisasi</div>
+          <div class="page-sub">Ringkasan agregat seluruh pegawai · 687 pegawai aktif</div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-ghost">Filter Departemen</button>
+          <button class="btn btn-primary">Ekspor Laporan</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid grid-4">
+          <div class="kpi">
+            <div class="kpi-label">Rata-rata Skor Indeks Kesehatan</div>
+            <div class="kpi-value">74.1</div>
+            <div class="kpi-trend trend-up">↑ 1.8 dari bulan lalu</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Pegawai Risiko Tinggi</div>
+            <div class="kpi-value">27</div>
+            <div class="kpi-trend trend-down">7.9% dari total pegawai</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Kehadiran Check-up Tahunan</div>
+            <div class="kpi-value">91%</div>
+            <div class="kpi-trend trend-up">↑ 4% dari tahun lalu</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Klaim Sakit (30 hari)</div>
+            <div class="kpi-value">18</div>
+            <div class="kpi-trend trend-flat">Stabil dari bulan lalu</div>
+          </div>
+        </div>
+
+        <svg class="pulse-divider" viewBox="0 0 1000 20" preserveAspectRatio="none">
+          <path d="M0,10 L380,10 L400,2 L420,18 L440,10 L460,10 L480,4 L495,16 L510,10 L1000,10"/>
+        </svg>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-title">Distribusi Risiko per Direktorat</div>
+            <div class="bar-row"><div class="bar-label">DSPA</div><div class="bar-track"><div class="bar-fill green" style="width:82%"></div></div><div class="bar-val">82</div></div>
+            <div class="bar-row"><div class="bar-label">DKRB</div><div class="bar-track"><div class="bar-fill" style="width:64%"></div></div><div class="bar-val">64</div></div>
+            <div class="bar-row"><div class="bar-label">DSDA</div><div class="bar-track"><div class="bar-fill amber" style="width:79%"></div></div><div class="bar-val">79</div></div>
+            <div class="bar-row"><div class="bar-label">DKEI</div><div class="bar-track"><div class="bar-fill amber" style="width:75%"></div></div><div class="bar-val">75</div></div>
+            <div class="bar-row"><div class="bar-label">DKRA</div><div class="bar-track"><div class="bar-fill red" style="width:52%"></div></div><div class="bar-val">52</div></div>
+            <div class="rec-desc" style="margin-top:6px;">Skor rata-rata Indeks Kesehatan (0–100) per departemen.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Faktor Risiko Paling Umum</div>
+            <div class="bar-row"><div class="bar-label">Kolesterol tinggi</div><div class="bar-track"><div class="bar-fill red" style="width:38%"></div></div><div class="bar-val">38%</div></div>
+            <div class="bar-row"><div class="bar-label">Kurang aktivitas fisik</div><div class="bar-track"><div class="bar-fill red" style="width:33%"></div></div><div class="bar-val">33%</div></div>
+            <div class="bar-row"><div class="bar-label">Hipertensi</div><div class="bar-track"><div class="bar-fill" style="width:21%"></div></div><div class="bar-val">21%</div></div>
+            <div class="bar-row"><div class="bar-label">Obesitas (BMI>27)</div><div class="bar-track"><div class="bar-fill amber" style="width:17%"></div></div><div class="bar-val">17%</div></div>
+            <div class="bar-row"><div class="bar-label">Gula darah tinggi</div><div class="bar-track"><div class="bar-fill amber" style="width:12%"></div></div><div class="bar-val">12%</div></div>
+          </div>
+        </div>
+
+        <div class="section-title orange">Pegawai Perlu Perhatian</div>
+        <div class="card">
+          <div class="table-wrap">
+          <table class="table">
+            <tr><th>Nama</th><th>Direktorat</th><th>Skor SIK</th><th>Faktor Risiko</th><th>Check-up Terakhir</th><th>Status</th></tr>
+            <tr><td>Firdauz</td><td>DSPA</td><td>52.3</td><td>Hipertensi, Obesitas</td><td>8 bulan lalu</td><td><span class="risk-badge risk-high">Tinggi</span></td></tr>
+            <tr><td>Wirawan</td><td>DHUK</td><td>58.1</td><td>Gula darah tinggi</td><td>3 bulan lalu</td><td><span class="risk-badge risk-high">Tinggi</span></td></tr>
+            <tr><td>Sulaiman</td><td>DTIF</td><td>61.7</td><td>Kolesterol tinggi</td><td>11 bulan lalu</td><td><span class="risk-badge risk-mid">Sedang</span></td></tr>
+            <tr><td>Rida</td><td>DKEI</td><td>64.2</td><td>Kurang aktivitas</td><td>5 bulan lalu</td><td><span class="risk-badge risk-mid">Sedang</span></td></tr>
+          </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW: DATA PEGAWAI (Admin) ============ -->
+    <section class="view" id="view-pegawai">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Data Pegawai</div>
+          <div class="page-sub">Manajemen profil kesehatan seluruh pegawai</div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-ghost">Impor Data</button>
+          <!-- <button class="btn btn-primary">+ Tambah Pegawai</button> -->
+        </div>
+      </div>
+      <div class="content">
+        <div class="card">
+          <div class="table-wrap">
+          <table class="table">
+            <tr><th>NIK</th><th>Nama</th><th>Direktorat</th><th>Skor SIK</th><th>Terakhir Diperbarui</th><th>Aksi</th></tr>
+            <tr><td>1234.5678</td><td>Budi</td><td>DSPA</td><td>78.7</td><td>08 Jul 2026</td><td><span class="sub-action">Lihat detail →</span></td></tr>
+            <tr><td>2345.6789</td><td>Firdauz</td><td>DTIF</td><td>52.3</td><td>05 Jul 2026</td><td><span class="sub-action">Lihat detail →</span></td></tr>
+            <tr><td>3456.7890</td><td>Rahmad</td><td>DKRB</td><td>58.1</td><td>03 Jul 2026</td><td><span class="sub-action">Lihat detail →</span></td></tr>
+            <tr><td>4567.8901</td><td>Toni</td><td>DSPB</td><td>61.7</td><td>01 Jul 2026</td><td><span class="sub-action">Lihat detail →</span></td></tr>
+            <tr><td>5678.9012</td><td>Zakaria</td><td>DKEI</td><td>64.2</td><td>28 Jun 2026</td><td><span class="sub-action">Lihat detail →</span></td></tr>
+          </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW: WELLNESS ============ -->
+    <section class="view" id="view-wellness">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Program Kesehatan</div>
+          <div class="page-sub">Program kesehatan yang bisa Anda ikuti</div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary">Lihat Semua Program</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid grid-3">
+          <div class="rec-card">
+            <div class="rec-tag">Fisik · Mingguan</div>
+            <div class="rec-title">Kelas Yoga Kantor</div>
+            <div class="rec-desc">Setiap Selasa & Kamis, 07.30 WIB di Lantai 3. Instruktur bersertifikat, kuota 20 orang.</div>
+            <div class="rec-foot"><span class="rec-priority">12/20 terdaftar</span><span class="sub-action">Daftar →</span></div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-tag">Mental · Mingguan</div>
+            <div class="rec-title">Sesi Mindfulness & Konseling</div>
+            <div class="rec-desc">Sesi 1-on-1 dengan psikolog mitra, tersedia secara rahasia melalui aplikasi.</div>
+            <div class="rec-foot"><span class="rec-priority">Tersedia</span><span class="sub-action">Booking →</span></div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-tag">Kompetisi · Bulanan</div>
+            <div class="rec-title">Tantangan 10.000 Langkah</div>
+            <div class="rec-desc">Kompetisi langkah antar-departemen, terintegrasi dengan wearable device. Hadiah menarik tiap bulan.</div>
+            <div class="rec-foot"><span class="rec-priority">Peringkat Anda: #14</span><span class="sub-action">Lihat papan skor →</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const hamburger = document.getElementById('hamburger');
+const sidebarClose = document.getElementById('sidebarClose');
+
+function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('open'); }
+function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+
+hamburger.addEventListener('click', openSidebar);
+sidebarClose.addEventListener('click', closeSidebar);
+overlay.addEventListener('click', closeSidebar);
+
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('view-'+item.dataset.view).classList.add('active');
+    closeSidebar();
+    window.scrollTo(0,0);
+  });
+});
+</script>
+
+</body>
+</html>

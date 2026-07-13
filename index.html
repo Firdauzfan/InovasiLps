@@ -337,6 +337,98 @@ body{
 
 .muted{ color:var(--text-muted); }
 
+/* ===================== MODAL: Input Self Assessment ===================== */
+.modal-overlay{
+  display:none; position:fixed; inset:0; background: rgba(15,23,32,0.45);
+  z-index: 60; align-items:center; justify-content:center; padding: 24px;
+  overflow-y:auto;
+}
+.modal-overlay.open{ display:flex; }
+
+.modal{
+  background: var(--surface); border-radius:16px; width:100%; max-width:600px;
+  box-shadow: var(--shadow-pop); max-height: calc(100vh - 48px); overflow-y:auto;
+  animation: modalIn .18s ease;
+}
+@keyframes modalIn{ from{opacity:0; transform:translateY(10px) scale(.98);} to{opacity:1; transform:translateY(0) scale(1);} }
+
+.modal-head{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  padding: 20px 24px; border-bottom:1px solid var(--border-soft);
+  position: sticky; top:0; background: var(--surface); border-radius:16px 16px 0 0;
+}
+.modal-title{ font-family: var(--font-display); font-size:17px; font-weight:600; }
+.modal-sub{ font-size:12px; color:var(--text-muted); margin-top:3px; }
+.modal-close{
+  width:32px; height:32px; border-radius:9px; border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-muted);
+  flex-shrink:0;
+}
+.modal-close:hover{ color: var(--blue); border-color: var(--blue); }
+
+.modal-body{ padding: 22px 24px; }
+
+.form-section-label{
+  font-family: var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:1px;
+  color: var(--text-faint); margin: 20px 0 12px;
+}
+.form-section-label:first-child{ margin-top:0; }
+
+.form-row{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+.form-group{ margin-bottom:14px; }
+.form-group label{
+  display:block; font-size:12.5px; font-weight:600; color:var(--text); margin-bottom:6px;
+}
+.form-group .hint{ font-size:11px; color:var(--text-faint); font-weight:400; margin-left:4px; }
+
+.form-control{
+  width:100%; padding:10px 12px; border-radius:9px; border:1px solid var(--border);
+  background: var(--surface-2); font-family: var(--font-body); font-size:13px; color:var(--text);
+  outline:none; transition: all .15s ease;
+}
+.form-control:focus{ border-color: var(--blue); background: var(--surface); box-shadow: 0 0 0 3px var(--blue-soft); }
+.form-control.mono{ font-family: var(--font-mono); }
+textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font-body); }
+
+.input-suffix{ position:relative; }
+.input-suffix .form-control{ padding-right:44px; }
+.input-suffix span{
+  position:absolute; right:12px; top:50%; transform:translateY(-50%);
+  font-family: var(--font-mono); font-size:11px; color: var(--text-faint); pointer-events:none;
+}
+
+.pair-input{ display:flex; align-items:center; gap:8px; }
+.pair-input .form-control{ text-align:center; }
+.pair-sep{ color:var(--text-faint); font-weight:600; }
+
+.chip-select{ display:flex; gap:8px; flex-wrap:wrap; }
+.chip-option{
+  padding:8px 14px; border-radius:20px; border:1px solid var(--border); background: var(--surface-2);
+  font-size:12px; font-weight:600; color:var(--text-muted); cursor:pointer; transition: all .15s ease;
+}
+.chip-option:hover{ border-color: var(--blue); color: var(--blue); }
+.chip-option.selected{ background: var(--blue-soft); border-color: var(--blue); color: var(--blue); }
+
+.bmi-preview{
+  display:flex; align-items:center; justify-content:space-between;
+  background: var(--surface-2); border:1px solid var(--border-soft); border-radius:10px;
+  padding:12px 14px; margin-top:4px;
+}
+.bmi-preview .label{ font-size:11.5px; color:var(--text-muted); }
+.bmi-preview .val{ font-family: var(--font-mono); font-size:16px; font-weight:600; }
+.bmi-preview .cat{ font-family: var(--font-mono); font-size:10.5px; font-weight:600; padding:3px 10px; border-radius:20px; }
+
+.modal-foot{
+  display:flex; justify-content:flex-end; gap:10px;
+  padding: 16px 24px; border-top:1px solid var(--border-soft);
+  position: sticky; bottom:0; background: var(--surface); border-radius:0 0 16px 16px;
+}
+
+@media (max-width: 560px){
+  .form-row{ grid-template-columns: 1fr; }
+  .modal-head, .modal-body, .modal-foot{ padding-left:18px; padding-right:18px; }
+}
+
 /* ===================== RESPONSIVE ===================== */
 
 /* Tablet */
@@ -475,7 +567,7 @@ body{
         </div>
         <div class="topbar-right">
           <!-- <div class="pill"><span class="dot"></span> Data tersinkron</div> -->
-          <button class="btn btn-ghost">Input Self-Assessment</button>
+          <button class="btn btn-ghost" id="btnInputVital">Input Self-Assessment</button>
           <button class="btn btn-primary">Unduh Laporan</button>
         </div>
       </div>
@@ -914,29 +1006,228 @@ body{
   </main>
 </div>
 
+<!-- ===================== MODAL: INPUT SELF ASSESSMENT ==================== -->
+<div class="modal-overlay" id="vitalModalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Input Data Self Assessment</div>
+        <div class="modal-sub">Isi data terbaru Anda untuk memperbarui Skor Indeks Kesehatan</div>
+      </div>
+      <div class="modal-close" id="vitalModalClose">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <form id="vitalForm">
+
+        <div class="form-section-label">Tanggal Pengukuran</div>
+        <div class="form-group">
+          <label>Tanggal Pengisian</label>
+          <input type="date" class="form-control mono" value="2026-07-13">
+        </div>
+
+        <div class="form-section-label">Tekanan Darah</div>
+        <div class="form-group">
+          <label>Sistolik / Diastolik <span class="hint">mmHg</span></label>
+          <div class="pair-input">
+            <input type="number" class="form-control mono" placeholder="120" id="sistolik">
+            <span class="pair-sep">/</span>
+            <input type="number" class="form-control mono" placeholder="80" id="diastolik">
+          </div>
+        </div>
+
+        <div class="form-section-label">Metabolik</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Gula Darah Puasa</label>
+            <div class="input-suffix">
+              <input type="number" class="form-control mono" placeholder="92" id="gulaDarah">
+              <span>mg/dL</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Kolesterol Total</label>
+            <div class="input-suffix">
+              <input type="number" class="form-control mono" placeholder="178" id="kolesterol">
+              <span>mg/dL</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section-label">Antropometri</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Berat Badan</label>
+            <div class="input-suffix">
+              <input type="number" class="form-control mono" placeholder="65" id="beratBadan" value="65">
+              <span>kg</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tinggi Badan</label>
+            <div class="input-suffix">
+              <input type="number" class="form-control mono" placeholder="170" id="tinggiBadan" value="170">
+              <span>cm</span>
+            </div>
+          </div>
+        </div>
+        <div class="bmi-preview">
+          <div>
+            <div class="label">Indeks Massa Tubuh (otomatis)</div>
+            <div class="val" id="bmiValue">—</div>
+          </div>
+          <div class="cat" id="bmiCategory">Menunggu data</div>
+        </div>
+
+        <div class="form-section-label">Respirasi</div>
+        <div class="form-group">
+          <label>Saturasi Oksigen (SpO2)</label>
+          <div class="input-suffix">
+            <input type="number" class="form-control mono" placeholder="98" id="spo2">
+            <span>%</span>
+          </div>
+        </div>
+
+        <div class="form-section-label">Gaya Hidup</div>
+        <div class="form-group">
+          <label>Frekuensi Aktivitas Fisik <span class="hint">per minggu</span></label>
+          <div class="chip-select" data-group="aktivitas">
+            <div class="chip-option">Tidak pernah</div>
+            <div class="chip-option">1–2 kali</div>
+            <div class="chip-option selected">3–4 kali</div>
+            <div class="chip-option">5+ kali</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Kualitas Tidur</label>
+          <div class="chip-select" data-group="tidur">
+            <div class="chip-option">Buruk</div>
+            <div class="chip-option selected">Cukup</div>
+            <div class="chip-option">Baik</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Kebiasaan Merokok</label>
+          <div class="chip-select" data-group="merokok">
+            <div class="chip-option selected">Tidak merokok</div>
+            <div class="chip-option">Kadang-kadang</div>
+            <div class="chip-option">Rutin</div>
+          </div>
+        </div>
+
+        <div class="form-section-label">Catatan Tambahan</div>
+        <div class="form-group">
+          <label>Keluhan atau catatan lain <span class="hint">opsional</span></label>
+          <textarea class="form-control" placeholder="Contoh: sering pusing ringan setelah bekerja lembur..."></textarea>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="vitalCancel">Batal</button>
+      <button class="btn btn-primary" id="vitalSubmit">Simpan Data</button>
+    </div>
+  </div>
+</div>
+
+
 <script>
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('overlay');
-const hamburger = document.getElementById('hamburger');
-const sidebarClose = document.getElementById('sidebarClose');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  const hamburger = document.getElementById('hamburger');
+  const sidebarClose = document.getElementById('sidebarClose');
 
-function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('open'); }
-function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+  function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('open'); }
+  function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('open'); }
 
-hamburger.addEventListener('click', openSidebar);
-sidebarClose.addEventListener('click', closeSidebar);
-overlay.addEventListener('click', closeSidebar);
+  hamburger.addEventListener('click', openSidebar);
+  sidebarClose.addEventListener('click', closeSidebar);
+  overlay.addEventListener('click', closeSidebar);
 
-document.querySelectorAll('.nav-item').forEach(item=>{
-  item.addEventListener('click', ()=>{
-    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    item.classList.add('active');
-    document.getElementById('view-'+item.dataset.view).classList.add('active');
-    closeSidebar();
-    window.scrollTo(0,0);
+  document.querySelectorAll('.nav-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById('view-'+item.dataset.view).classList.add('active');
+      closeSidebar();
+      window.scrollTo(0,0);
+    });
   });
-});
+
+  /* ===== Modal  Input Data Self Assessment ===== */
+  const vitalModalOverlay = document.getElementById('vitalModalOverlay');
+  const btnInputVital = document.getElementById('btnInputVital');
+  const vitalModalClose = document.getElementById('vitalModalClose');
+  const vitalCancel = document.getElementById('vitalCancel');
+  const vitalSubmit = document.getElementById('vitalSubmit');
+
+  function openVitalModal()
+  { 
+    vitalModalOverlay.classList.add('open'); 
+    document.body.style.overflow='hidden';
+    
+    updateBMI();
+  }
+  function closeVitalModal(){ vitalModalOverlay.classList.remove('open'); document.body.style.overflow=''; }
+
+  if(btnInputVital){ btnInputVital.addEventListener('click', openVitalModal); }
+  vitalModalClose.addEventListener('click', closeVitalModal);
+  vitalCancel.addEventListener('click', closeVitalModal);
+  vitalModalOverlay.addEventListener('click', (e)=>{ if(e.target === vitalModalOverlay) closeVitalModal(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeVitalModal(); });
+
+  vitalSubmit.addEventListener('click', ()=>{
+    closeVitalModal();
+  });
+
+  /* Chip select (single-select per group) */
+  document.querySelectorAll('.chip-select').forEach(group=>{
+    group.querySelectorAll('.chip-option').forEach(opt=>{
+      opt.addEventListener('click', ()=>{
+        group.querySelectorAll('.chip-option').forEach(o=>o.classList.remove('selected'));
+        opt.classList.add('selected');
+      });
+    });
+  });
+
+  /* BMI auto-calculation */
+  const beratInput = document.getElementById('beratBadan');
+  const tinggiInput = document.getElementById('tinggiBadan');
+  const bmiValue = document.getElementById('bmiValue');
+  const bmiCategory = document.getElementById('bmiCategory');
+
+  function updateBMI(){
+    const berat = parseFloat(beratInput.value);
+    const tinggiCm = parseFloat(tinggiInput.value);
+
+    if(!berat || !tinggiCm){
+
+      bmiValue.textContent = '—';
+      bmiCategory.textContent = 'Menunggu data';
+      bmiCategory.style.background = 'var(--surface-3)';
+      bmiCategory.style.color = 'var(--text-faint)';
+      return;
+    }
+
+    const tinggiM = tinggiCm / 100;
+    const bmi = berat / (tinggiM * tinggiM);
+    bmiValue.textContent = bmi.toFixed(1);
+    let cat, bg, color;
+    if(bmi < 18.5){ cat='Kurus'; bg='var(--blue-soft)'; color='var(--blue)'; }
+    else if(bmi < 25){ cat='Ideal'; bg='var(--green-soft)'; color='#1A9760'; }
+    else if(bmi < 27){ cat='Kelebihan BB'; bg='var(--orange-soft)'; color='var(--orange)'; }
+    else { cat='Obesitas'; bg='var(--red-soft)'; color='var(--red)'; }
+
+    bmiCategory.textContent = cat;
+    bmiCategory.style.background = bg;
+    bmiCategory.style.color = color;
+  }
+  beratInput.addEventListener('input', updateBMI);
+  tinggiInput.addEventListener('input', updateBMI);
 </script>
 
 </body>

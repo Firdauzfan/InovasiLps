@@ -337,7 +337,7 @@ body{
 
 .muted{ color:var(--text-muted); }
 
-/* ===================== MODAL: Input Self Assessment ===================== */
+/* ===================== MODAL: Health Check-in ===================== */
 .modal-overlay{
   display:none; position:fixed; inset:0; background: rgba(15,23,32,0.45);
   z-index: 60; align-items:center; justify-content:center; padding: 24px;
@@ -480,6 +480,35 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
   .topbar-right .btn{ flex:1; text-align:center; }
   .kpi-value{ font-size:22px; }
 }
+
+/* ===================== GENERIC INFO MODAL ===================== */
+.hist-item{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:11px 0; border-bottom:1px solid var(--border-soft);
+}
+.hist-item:last-child{ border-bottom:none; }
+.hist-item .hd{ font-size:12.5px; font-weight:600; }
+.hist-item .hs{ font-size:11px; color:var(--text-faint); margin-top:2px; }
+.hist-item .hv{ font-family:var(--font-mono); font-size:13.5px; font-weight:600; text-align:right; }
+
+.alt-item{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px; border:1px solid var(--border-soft); border-radius:11px; margin-bottom:10px;
+}
+.alt-item:last-child{ margin-bottom:0; }
+.alt-item .at{ font-size:13px; font-weight:600; }
+.alt-item .as{ font-size:11px; color:var(--text-muted); margin-top:2px; }
+
+.detail-kv{ display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-soft); gap:12px; }
+.detail-kv:last-child{ border-bottom:none; }
+.detail-kv .k{ font-size:12px; color:var(--text-muted); flex-shrink:0; }
+.detail-kv .v{ font-size:12.5px; font-weight:600; text-align:right; }
+
+.route-box{
+  background: var(--surface-2); border:1px solid var(--border-soft); border-radius:12px;
+  height:140px; display:flex; align-items:center; justify-content:center; margin-bottom:14px;
+  color: var(--text-faint); font-size:11.5px; font-family:var(--font-mono); gap:8px; flex-direction:column;
+}
 </style>
 </head>
 <body>
@@ -548,7 +577,7 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
 
     <div class="mobile-topbar">
       <div class="brand">
-        <div class="brand-mark">V</div>
+        <div class="brand-mark">O</div>
         <div>
           <div class="brand-name">One Health</div>
         </div>
@@ -567,7 +596,7 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
         </div>
         <div class="topbar-right">
           <!-- <div class="pill"><span class="dot"></span> Data tersinkron</div> -->
-          <button class="btn btn-ghost" id="btnInputVital">Input Self-Assessment</button>
+          <button class="btn btn-ghost" id="btnInputVital">Health Check-in</button>
           <button class="btn btn-primary">Unduh Laporan</button>
         </div>
       </div>
@@ -575,37 +604,39 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
       <div class="content">
         <div class="grid grid-2">
           <div class="card accent-card">
-            <div class="card-title">Skor Indeks Kesehatan (SIK) <span class="sub-action">Metodologi →</span></div>
+            <div class="card-title">Langkah Harian <span class="sub-action">Riwayat →</span></div>
             <div class="gauge-wrap">
               <svg width="140" height="140" viewBox="0 0 150 150">
                 <circle cx="75" cy="75" r="62" fill="none" stroke="var(--surface-2)" stroke-width="12"/>
-                <circle cx="75" cy="75" r="62" fill="none" stroke="url(#gaugeGrad)" stroke-width="12"
-                  stroke-linecap="round" stroke-dasharray="389.5" stroke-dashoffset="82.8"
+                <circle cx="75" cy="75" r="62" fill="none" stroke="url(#stepGrad)" stroke-width="12"
+                  stroke-linecap="round" stroke-dasharray="389.5" stroke-dashoffset="93.5"
                   transform="rotate(-90 75 75)"/>
                 <defs>
-                  <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#F2823D"/>
+                  <linearGradient id="stepGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#2F6FED"/>
                     <stop offset="100%" stop-color="#22B573"/>
                   </linearGradient>
                 </defs>
-                <text x="75" y="85" text-anchor="middle" class="gauge-num">78.7</text>
-                <text x="75" y="108" text-anchor="middle" class="gauge-label">DARI 100</text>
+                <text x="75" y="80" text-anchor="middle" class="gauge-num" style="font-size:28px;">7.842</text>
+                <text x="75" y="100" text-anchor="middle" class="gauge-label">/ 10.000 LANGKAH</text>
               </svg>
               <div class="gauge-info">
-                <div class="status-chip status-good">● BAIK — Tingkat Kesehatan II</div>
-                <div class="gauge-desc">Skor Anda naik 4.2 poin sejak evaluasi bulan lalu. Dipengaruhi utamanya oleh perbaikan profil kolesterol dan aktivitas fisik rutin.</div>
+                <div class="status-chip status-good">● Terhubung — Google Fit</div>
+                <div class="gauge-desc">78% dari target harian tercapai. Rata-rata 7 hari terakhir: 8.120 langkah/hari.</div>
                 <div class="factor-row">
-                  <span class="factor-tag">BMI: 22.4</span>
-                  <span class="factor-tag">Tek. Darah: 118/76</span>
-                  <span class="factor-tag">Gula Darah: 92 mg/dL</span>
-                  <span class="factor-tag">Kolesterol Total: 178</span>
+                  <span class="factor-tag">🔥 312 kkal</span>
+                  <span class="factor-tag">📏 5.4 km</span>
+                  <span class="factor-tag">⏱ 62 menit aktif</span>
+                </div>
+                <div style="margin-top:14px;">
+                  <button class="btn btn-ghost" id="btnKelolaPerangkat" style="font-size:12px;padding:7px 14px;">Kelola Perangkat</button>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="card">
-            <div class="card-title">Self Assessment Terbaru <span class="sub-action">Riwayat →</span></div>
+            <div class="card-title">Health Check-in Terbaru <span class="sub-action">Riwayat →</span></div>
             <div class="vital-item">
               <div class="vital-name"><div class="vital-icon">❤️</div>Tekanan Darah</div>
               <div><div class="vital-value">118/76</div><div class="vital-range">Normal · mmHg</div></div>
@@ -621,6 +652,59 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
             <div class="vital-item">
               <div class="vital-name"><div class="vital-icon">🫁</div>Saturasi Oksigen</div>
               <div><div class="vital-value">98%</div><div class="vital-range">Normal</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-3" style="margin-top:16px;">
+          <div class="card">
+            <div class="card-title">Waktu Tidur <span class="sub-action">Riwayat →</span></div>
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="font-family:var(--font-mono); font-size:28px; font-weight:600;">6j 45m</div>
+              <div class="status-chip status-warn">Cukup</div>
+            </div>
+            <div class="gauge-desc" style="margin-top:10px; max-width:none;">Tidur 23.10 · bangun 05.55. Rata-rata 7 hari: 6j 58m, sedikit di bawah rekomendasi 7–9 jam.</div>
+            <div class="bar-row" style="margin-top:14px; margin-bottom:0;">
+              <div class="bar-label">Konsistensi</div>
+              <div class="bar-track"><div class="bar-fill amber" style="width:68%"></div></div>
+              <div class="bar-val">68%</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Siklus Haid <span class="sub-action">Catat →</span></div>
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="font-family:var(--font-mono); font-size:28px; font-weight:600;">H-18</div>
+              <div class="status-chip status-good">Fase Luteal</div>
+            </div>
+            <div class="gauge-desc" style="margin-top:10px; max-width:none;">Perkiraan siklus berikutnya 26 Jul 2026 (10 hari lagi). Rata-rata 28 hari, teratur 6 bulan terakhir.</div>
+            <div class="bar-row" style="margin-top:14px; margin-bottom:0;">
+              <div class="bar-label">Progres Siklus</div>
+              <div class="bar-track"><div class="bar-fill" style="width:64%"></div></div>
+              <div class="bar-val">18/28</div>
+            </div>
+            <div style="font-size:10.5px;color:var(--text-faint);margin-top:10px;">🔒 Data privat, hanya terlihat oleh Anda</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Klinik Faskes 1 Terdekat <span class="sub-action">Ganti Faskes →</span></div>
+            <div class="sched-item" style="padding-top:0; border-bottom:none;">
+              <div class="sched-date" style="background:var(--green-soft);">
+                <div class="d" style="color:#1A9760;">1.2</div>
+                <div class="m" style="color:#1A9760;">KM</div>
+              </div>
+              <div class="sched-info">
+                <div class="t">Klinik Pratama Setiabudi Sehat</div>
+                <div class="s">Jl. Setiabudi Raya No. 12 · Faskes Tingkat 1 BPJS</div>
+              </div>
+            </div>
+            <div class="factor-row" style="margin-top:4px;">
+              <span class="factor-tag">🕐 Buka · Tutup 20.00</span>
+              <span class="factor-tag">📞 (021) 555-0142</span>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:14px;">
+              <button class="btn btn-ghost" id="btnLihatRute" style="flex:1;font-size:12px;padding:8px;">Lihat Rute</button>
+              <button class="btn btn-primary" style="flex:1;font-size:12px;padding:8px;">Hubungi</button>
             </div>
           </div>
         </div>
@@ -652,7 +736,7 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
           </div>
         </div>
 
-        <div class="section-title">Rekomendasi Prioritas<span class="st-action">Lihat Detail →</span></div>
+        <div class="section-title">Rekomendasi Prioritas<span class="st-action" data-nav-view="rekomendasi">Lihat Detail →</span></div>
         <div class="grid grid-3">
           <div class="rec-card">
             <div class="rec-tag">Nutrisi</div>
@@ -1006,13 +1090,13 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
   </main>
 </div>
 
-<!-- ===================== MODAL: INPUT SELF ASSESSMENT ==================== -->
+<!-- ===================== MODAL: HEALTH CHECK-IN ==================== -->
 <div class="modal-overlay" id="vitalModalOverlay">
   <div class="modal">
     <div class="modal-head">
       <div>
-        <div class="modal-title">Input Data Self Assessment</div>
-        <div class="modal-sub">Isi data terbaru Anda untuk memperbarui Skor Indeks Kesehatan</div>
+        <div class="modal-title">Health Check-in</div>
+        <div class="modal-sub">Isi data kesehatan terbaru Anda secara berkala</div>
       </div>
       <div class="modal-close" id="vitalModalClose">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -1090,6 +1174,36 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
           </div>
         </div>
 
+        <div class="form-section-label">Aktivitas & Tidur <span class="hint">isi manual bila perangkat belum terhubung</span></div>
+        <div style="display:flex; align-items:flex-start; gap:8px; background:var(--blue-soft); border:1px solid var(--blue-dim); border-radius:9px; padding:10px 12px; margin-bottom:14px;">
+          <span style="font-size:13px;">ℹ️</span>
+          <span style="font-size:11.5px; color:var(--text); line-height:1.5;">Data langkah &amp; tidur biasanya sinkron otomatis dari perangkat yang terhubung (mis. Google Fit). Isi kolom di bawah hanya jika perangkat Anda belum terhubung.</span>
+        </div>
+        <div class="form-group">
+          <label>Langkah Harian <span class="hint">opsional jika sudah sinkron otomatis</span></label>
+          <div class="input-suffix">
+            <input type="number" class="form-control mono" placeholder="7842" id="langkahManual">
+            <span>langkah</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Jam Tidur</label>
+            <input type="time" class="form-control mono" id="jamTidur" value="23:10">
+          </div>
+          <div class="form-group">
+            <label>Jam Bangun</label>
+            <input type="time" class="form-control mono" id="jamBangun" value="05:55">
+          </div>
+        </div>
+        <div class="bmi-preview">
+          <div>
+            <div class="label">Durasi Tidur (otomatis)</div>
+            <div class="val" id="sleepDurationValue">—</div>
+          </div>
+          <div class="cat" id="sleepDurationCategory">Menunggu data</div>
+        </div>
+
         <div class="form-section-label">Gaya Hidup</div>
         <div class="form-group">
           <label>Frekuensi Aktivitas Fisik <span class="hint">per minggu</span></label>
@@ -1133,6 +1247,25 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
   </div>
 </div>
 
+<!-- ===================== MODAL: GENERIC INFO (Riwayat / Catat / Ganti Faskes / Rute / Detail) ==================== -->
+<div class="modal-overlay" id="infoModalOverlay">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="infoModalTitle">Judul</div>
+        <div class="modal-sub" id="infoModalSub">Subjudul</div>
+      </div>
+      <div class="modal-close" id="infoModalClose">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body" id="infoModalBody"></div>
+    <div class="modal-foot" id="infoModalFoot">
+      <button class="btn btn-ghost" id="infoModalCloseBtn">Tutup</button>
+    </div>
+  </div>
+</div>
+
 
 <script>
   const sidebar = document.getElementById('sidebar');
@@ -1158,7 +1291,7 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
     });
   });
 
-  /* ===== Modal  Input Data Self Assessment ===== */
+  /* ===== Modal Health Check-in ===== */
   const vitalModalOverlay = document.getElementById('vitalModalOverlay');
   const btnInputVital = document.getElementById('btnInputVital');
   const vitalModalClose = document.getElementById('vitalModalClose');
@@ -1171,6 +1304,7 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
     document.body.style.overflow='hidden';
     
     updateBMI();
+    updateSleepDuration();
   }
   function closeVitalModal(){ vitalModalOverlay.classList.remove('open'); document.body.style.overflow=''; }
 
@@ -1228,6 +1362,274 @@ textarea.form-control{ resize:vertical; min-height:70px; font-family: var(--font
   }
   beratInput.addEventListener('input', updateBMI);
   tinggiInput.addEventListener('input', updateBMI);
+
+  /* Sleep duration auto-calculation (manual entry) */
+  const jamTidurInput = document.getElementById('jamTidur');
+  const jamBangunInput = document.getElementById('jamBangun');
+  const sleepDurationValue = document.getElementById('sleepDurationValue');
+  const sleepDurationCategory = document.getElementById('sleepDurationCategory');
+
+  function updateSleepDuration(){
+    const t1 = jamTidurInput.value;
+    const t2 = jamBangunInput.value;
+    if(!t1 || !t2){
+      sleepDurationValue.textContent = '—';
+      sleepDurationCategory.textContent = 'Menunggu data';
+      sleepDurationCategory.style.background = 'var(--surface-3)';
+      sleepDurationCategory.style.color = 'var(--text-faint)';
+      return;
+    }
+    const [h1,m1] = t1.split(':').map(Number);
+    const [h2,m2] = t2.split(':').map(Number);
+    let mins = (h2*60+m2) - (h1*60+m1);
+    if(mins <= 0) mins += 24*60;
+    const jam = Math.floor(mins/60);
+    const menit = mins%60;
+    sleepDurationValue.textContent = jam+'j '+menit+'m';
+    let cat, bg, color;
+    if(mins < 6*60){ cat='Kurang'; bg='var(--red-soft)'; color='var(--red)'; }
+    else if(mins < 7*60){ cat='Cukup'; bg='var(--orange-soft)'; color='var(--orange)'; }
+    else if(mins <= 9*60){ cat='Baik'; bg='var(--green-soft)'; color='#1A9760'; }
+    else { cat='Berlebih'; bg='var(--orange-soft)'; color='var(--orange)'; }
+    sleepDurationCategory.textContent = cat;
+    sleepDurationCategory.style.background = bg;
+    sleepDurationCategory.style.color = color;
+  }
+  jamTidurInput.addEventListener('input', updateSleepDuration);
+  jamBangunInput.addEventListener('input', updateSleepDuration);
+
+  /* ===== Generic Info Modal (Riwayat / Catat / Ganti Faskes / Rute / Detail) ===== */
+  const infoModalOverlay = document.getElementById('infoModalOverlay');
+  const infoModalTitle = document.getElementById('infoModalTitle');
+  const infoModalSub = document.getElementById('infoModalSub');
+  const infoModalBody = document.getElementById('infoModalBody');
+  const infoModalFoot = document.getElementById('infoModalFoot');
+  const infoModalClose = document.getElementById('infoModalClose');
+  const infoModalCloseBtn = document.getElementById('infoModalCloseBtn');
+
+  function openInfoModal(title, sub, bodyHTML, footHTML){
+    infoModalTitle.textContent = title;
+    infoModalSub.textContent = sub;
+    infoModalBody.innerHTML = bodyHTML;
+    infoModalFoot.innerHTML = footHTML || '<button class="btn btn-ghost" id="infoModalCloseBtn2">Tutup</button>';
+    const closeBtn2 = document.getElementById('infoModalCloseBtn2');
+    if(closeBtn2) closeBtn2.addEventListener('click', closeInfoModal);
+    infoModalOverlay.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function closeInfoModal(){ infoModalOverlay.classList.remove('open'); document.body.style.overflow=''; }
+  infoModalClose.addEventListener('click', closeInfoModal);
+  infoModalCloseBtn.addEventListener('click', closeInfoModal);
+  infoModalOverlay.addEventListener('click', (e)=>{ if(e.target === infoModalOverlay) closeInfoModal(); });
+
+  /* ---- Content templates: Riwayat ---- */
+  const historyTemplates = {
+    'Langkah Harian': {
+      sub: 'Rekap 7 hari terakhir',
+      body: `
+        <div class="hist-item"><div><div class="hd">Senin, 07 Jul</div><div class="hs">Terhubung — Google Fit</div></div><div class="hv">8.412 langkah</div></div>
+        <div class="hist-item"><div><div class="hd">Selasa, 08 Jul</div><div class="hs">Terhubung — Google Fit</div></div><div class="hv">6.980 langkah</div></div>
+        <div class="hist-item"><div><div class="hd">Rabu, 09 Jul</div><div class="hs">Terhubung — Google Fit</div></div><div class="hv">9.145 langkah</div></div>
+        <div class="hist-item"><div><div class="hd">Kamis, 10 Jul</div><div class="hs">Terhubung — Google Fit</div></div><div class="hv">7.230 langkah</div></div>
+        <div class="hist-item"><div><div class="hd">Jumat, 11 Jul</div><div class="hs">Input manual</div></div><div class="hv">5.610 langkah</div></div>
+        <div class="hist-item"><div><div class="hd">Sabtu, 12 Jul</div><div class="hs">Terhubung — Google Fit</div></div><div class="hv">10.320 langkah</div></div>
+        <div class="hist-item"><div><div class="hd">Minggu, 13 Jul</div><div class="hs">Terhubung — Google Fit</div></div><div class="hv">7.842 langkah</div></div>
+      `
+    },
+    'Health Check-in Terbaru': {
+      sub: 'Riwayat pengisian Health Check-in',
+      body: `
+        <div class="hist-item"><div><div class="hd">13 Jul 2026</div><div class="hs">Tek. darah 118/76 · Gula darah 92</div></div><div class="hv">Normal</div></div>
+        <div class="hist-item"><div><div class="hd">29 Jun 2026</div><div class="hs">Tek. darah 121/79 · Gula darah 95</div></div><div class="hv">Normal</div></div>
+        <div class="hist-item"><div><div class="hd">15 Jun 2026</div><div class="hs">Tek. darah 124/80 · Gula darah 98</div></div><div class="hv">Normal</div></div>
+        <div class="hist-item"><div><div class="hd">01 Jun 2026</div><div class="hs">Tek. darah 128/84 · Gula darah 101</div></div><div class="hv">Waspada</div></div>
+      `
+    },
+    'Waktu Tidur': {
+      sub: 'Rekap 7 hari terakhir',
+      body: `
+        <div class="hist-item"><div><div class="hd">Senin, 07 Jul</div><div class="hs">Tidur 23.20 · Bangun 05.50</div></div><div class="hv">6j 30m</div></div>
+        <div class="hist-item"><div><div class="hd">Selasa, 08 Jul</div><div class="hs">Tidur 22.50 · Bangun 06.00</div></div><div class="hv">7j 10m</div></div>
+        <div class="hist-item"><div><div class="hd">Rabu, 09 Jul</div><div class="hs">Tidur 00.15 · Bangun 06.10</div></div><div class="hv">5j 55m</div></div>
+        <div class="hist-item"><div><div class="hd">Kamis, 10 Jul</div><div class="hs">Tidur 23.05 · Bangun 05.45</div></div><div class="hv">6j 40m</div></div>
+        <div class="hist-item"><div><div class="hd">Jumat, 11 Jul</div><div class="hs">Tidur 23.30 · Bangun 06.20</div></div><div class="hv">6j 50m</div></div>
+        <div class="hist-item"><div><div class="hd">Sabtu, 12 Jul</div><div class="hs">Tidur 23.40 · Bangun 07.10</div></div><div class="hv">7j 30m</div></div>
+        <div class="hist-item"><div><div class="hd">Minggu, 13 Jul</div><div class="hs">Tidur 23.10 · Bangun 05.55</div></div><div class="hv">6j 45m</div></div>
+      `
+    }
+  };
+
+  /* ---- Content: Catat Siklus Haid (form) ---- */
+  function openCatatHaid(){
+    const body = `
+      <div class="form-group">
+        <label>Tanggal Mulai Haid</label>
+        <input type="date" class="form-control mono" value="2026-07-13">
+      </div>
+      <div class="form-group">
+        <label>Intensitas Aliran</label>
+        <div class="chip-select" data-group="haid-intensitas">
+          <div class="chip-option">Ringan</div>
+          <div class="chip-option selected">Normal</div>
+          <div class="chip-option">Berat</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Gejala <span class="hint">bisa pilih lebih dari satu</span></label>
+        <div class="chip-select" data-group="haid-gejala" data-multi="true">
+          <div class="chip-option">Kram</div>
+          <div class="chip-option">Sakit Kepala</div>
+          <div class="chip-option">Mood Swing</div>
+          <div class="chip-option">Kelelahan</div>
+          <div class="chip-option">Tidak Ada</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Catatan <span class="hint">opsional</span></label>
+        <textarea class="form-control" placeholder="Catatan tambahan..."></textarea>
+      </div>
+      <div style="font-size:10.5px;color:var(--text-faint);">🔒 Data ini privat dan hanya terlihat oleh Anda.</div>
+    `;
+    openInfoModal('Catat Siklus Haid', 'Perbarui data siklus untuk prediksi yang lebih akurat', body,
+      '<button class="btn btn-ghost" id="infoModalCloseBtn2">Batal</button><button class="btn btn-primary" id="infoModalSaveBtn">Simpan</button>');
+    bindChipSelects();
+    const saveBtn = document.getElementById('infoModalSaveBtn');
+    if(saveBtn) saveBtn.addEventListener('click', closeInfoModal);
+  }
+
+  /* ---- Content: Ganti Faskes ---- */
+  function openGantiFaskes(){
+    const body = `
+      <div class="alt-item">
+        <div><div class="at">Klinik Pratama Setiabudi Sehat</div><div class="as">1.2 km · Jl. Setiabudi Raya No. 12</div></div>
+        <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px;" onclick="this.textContent='Terpilih ✓'">Pilih</button>
+      </div>
+      <div class="alt-item">
+        <div><div class="at">Puskesmas Kecamatan Setiabudi</div><div class="as">2.4 km · Jl. HR Rasuna Said Kav. 5</div></div>
+        <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px;" onclick="this.textContent='Terpilih ✓'">Pilih</button>
+      </div>
+      <div class="alt-item">
+        <div><div class="at">Klinik Pratama Karet Mitra</div><div class="as">3.1 km · Jl. Karet Pedurenan No. 8</div></div>
+        <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px;" onclick="this.textContent='Terpilih ✓'">Pilih</button>
+      </div>
+    `;
+    openInfoModal('Ganti Faskes Tingkat 1', 'Pilih faskes BPJS terdekat lainnya', body);
+  }
+
+  /* ---- Content: Lihat Rute ---- */
+  function openLihatRute(){
+    const body = `
+      <div class="route-box">🗺️<div>Pratinjau rute — Jl. Setiabudi Raya No. 12</div></div>
+      <div class="detail-kv"><div class="k">Jarak</div><div class="v">1.2 km</div></div>
+      <div class="detail-kv"><div class="k">Estimasi waktu (mobil)</div><div class="v">6 menit</div></div>
+      <div class="detail-kv"><div class="k">Estimasi waktu (jalan kaki)</div><div class="v">15 menit</div></div>
+    `;
+    openInfoModal('Rute ke Klinik Pratama Setiabudi Sehat', 'Jl. Setiabudi Raya No. 12', body,
+      '<button class="btn btn-ghost" id="infoModalCloseBtn2">Tutup</button><button class="btn btn-primary">Buka di Google Maps</button>');
+  }
+
+  /* ---- Content: Detail Rekomendasi ---- */
+  function openRecDetail(card){
+    const tag = card.querySelector('.rec-tag')?.textContent.trim() || '';
+    const title = card.querySelector('.rec-title')?.textContent.trim() || '';
+    const desc = card.querySelector('.rec-desc')?.textContent.trim() || '';
+    const priority = card.querySelector('.rec-priority')?.textContent.trim() || '';
+    let borderColor = 'var(--blue)';
+    if(card.classList.contains('amber')) borderColor = 'var(--orange)';
+    if(card.classList.contains('red')) borderColor = 'var(--red)';
+    const body = `
+      <div style="border-left:3px solid ${borderColor}; padding-left:14px;">
+        <div class="rec-tag" style="margin-bottom:4px;">${tag}</div>
+        <div class="rec-desc" style="font-size:13px; line-height:1.7;">${desc}</div>
+      </div>
+      <div class="detail-kv" style="margin-top:16px;"><div class="k">Status</div><div class="v">${priority}</div></div>
+      <div class="detail-kv"><div class="k">Kategori</div><div class="v">${tag}</div></div>
+    `;
+    openInfoModal(title, 'Detail rekomendasi kesehatan', body,
+      '<button class="btn btn-ghost" id="infoModalCloseBtn2">Tutup</button><button class="btn btn-primary" id="infoModalSaveBtn">Tandai Selesai</button>');
+    const saveBtn = document.getElementById('infoModalSaveBtn');
+    if(saveBtn) saveBtn.addEventListener('click', closeInfoModal);
+  }
+
+  /* ---- Content: Lihat Detail (table row) ---- */
+  function openTableDetail(tr){
+    const table = tr.closest('table');
+    const headerCells = Array.from(table.querySelectorAll('tr').item(0).querySelectorAll('th')).map(th=>th.textContent.trim());
+    const cells = Array.from(tr.querySelectorAll('td')).map(td=>td.textContent.trim());
+    let body = '';
+    for(let i=0; i<cells.length-1; i++){
+      body += `<div class="detail-kv"><div class="k">${headerCells[i]||''}</div><div class="v">${cells[i]}</div></div>`;
+    }
+    const nameGuess = cells[1] || cells[0] || 'Pegawai';
+    openInfoModal(nameGuess, 'Profil kesehatan pegawai', body);
+  }
+
+  /* ---- Chip multi-select support for Catat Haid modal ---- */
+  function bindChipSelects(){
+    infoModalBody.querySelectorAll('.chip-select').forEach(group=>{
+      group.querySelectorAll('.chip-option').forEach(opt=>{
+        opt.addEventListener('click', ()=>{
+          if(group.dataset.multi === 'true'){
+            opt.classList.toggle('selected');
+          } else {
+            group.querySelectorAll('.chip-option').forEach(o=>o.classList.remove('selected'));
+            opt.classList.add('selected');
+          }
+        });
+      });
+    });
+  }
+
+  /* ---- Wire up all triggers ---- */
+  document.getElementById('btnKelolaPerangkat').addEventListener('click', ()=>{
+    const body = `
+      <div class="detail-kv"><div class="k">Perangkat Terhubung</div><div class="v">Google Fit</div></div>
+      <div class="detail-kv"><div class="k">Status Sinkronisasi</div><div class="v">Aktif · 5 menit lalu</div></div>
+      <div class="detail-kv"><div class="k">Data yang disinkron</div><div class="v">Langkah, Jarak, Kalori</div></div>
+      <div style="font-size:11.5px;color:var(--text-muted); margin-top:14px; line-height:1.6;">
+        Belum punya perangkat terhubung? Tidak masalah — Anda tetap bisa mencatat Langkah Harian dan Waktu Tidur secara manual lewat form <strong>Health Check-in</strong>.
+      </div>
+    `;
+    openInfoModal('Kelola Perangkat', 'Koneksi wearable & aplikasi kesehatan', body,
+      '<button class="btn btn-ghost" id="infoModalCloseBtn2">Tutup</button><button class="btn btn-primary" style="background:var(--red);">Putuskan Koneksi</button>');
+  });
+
+  document.getElementById('btnLihatRute').addEventListener('click', openLihatRute);
+
+  document.addEventListener('click', (e)=>{
+    const el = e.target.closest('.sub-action, .st-action');
+    if(!el) return;
+
+    if(el.dataset.navView){
+      const navItem = document.querySelector('.nav-item[data-view="'+el.dataset.navView+'"]');
+      if(navItem) navItem.click();
+      return;
+    }
+
+    const tr = el.closest('tr');
+    if(tr && /lihat detail/i.test(el.textContent)){
+      openTableDetail(tr);
+      return;
+    }
+
+    const recCard = el.closest('.rec-card');
+    if(recCard){
+      openRecDetail(recCard);
+      return;
+    }
+
+    const cardTitle = el.closest('.card-title');
+    if(cardTitle){
+      const titleText = cardTitle.childNodes[0].textContent.trim();
+      if(titleText === 'Siklus Haid'){ openCatatHaid(); return; }
+      if(titleText === 'Klinik Faskes 1 Terdekat'){ openGantiFaskes(); return; }
+      if(historyTemplates[titleText]){
+        const tmpl = historyTemplates[titleText];
+        openInfoModal(titleText, tmpl.sub, tmpl.body);
+        return;
+      }
+    }
+  });
 </script>
 
 </body>
